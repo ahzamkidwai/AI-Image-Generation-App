@@ -1,4 +1,4 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 
 const Post = new mongoose.Schema({
   name: { type: String, require: true },
@@ -8,4 +8,4 @@ const Post = new mongoose.Schema({
 
 const PostSchema = mongoose.model("Post", Post);
 
-export default PostSchema
+export default PostSchema;

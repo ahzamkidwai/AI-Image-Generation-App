@@ -14,14 +14,45 @@ const CreatePost = () => {
   const [generatingImg, setGeneratingImg] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const generateImage = async () => {
+    if (formData.prompt) {
+      try {
+        setGeneratingImg(true);
+
+        const response = await fetch("http://localhost:8080/api/v1/dalle", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ prompt: formData.prompt }),
+        });
+
+        const resposeData = await response.json();
+        console.log("Response Data is (inside CreatePost.jsx) : ", resposeData);
+        setFormData({
+          ...formData,
+          photo: `data:image/jpeg;base64,${resposeData.photo}`,
+        });
+      } catch (error) {
+        alert(error);
+        console.log("Error occured while generating image ", error.message);
+      } finally {
+        setGeneratingImg(false);
+      }
+    } else {
+      alert("Please enter a prompt");
+    }
+  };
+
   const submitFormHandler = () => {};
 
-  const handleChange = (e) =>
-    setForm({ ...formData, [e.target.name]: e.target.value });
-
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    console.log("FormData is : ", formData);
+  };
   const handleSurpriseMe = () => {
     const randomPrompt = getRandomPrompt(formData.prompt);
-    setForm({ ...formData, prompt: randomPrompt });
+    setFormData({ ...formData, prompt: randomPrompt });
   };
 
   return (
@@ -42,7 +73,7 @@ const CreatePost = () => {
             name="name"
             placeholder="Ahzam Kidwai"
             value={formData.name}
-            onChange={handleChange}
+            handleChange={handleChange}
           />
           <FormField
             labelName="Your Prompt"
@@ -50,7 +81,7 @@ const CreatePost = () => {
             name="prompt"
             placeholder="The long-lost Star Wars 1990 Japanese Anime"
             value={formData.prompt}
-            onChange={handleChange}
+            handleChange={handleChange}
             isSurpriseMe
             handleSurpriseMe={handleSurpriseMe}
           />
@@ -81,7 +112,7 @@ const CreatePost = () => {
         <div className="mt-5 flex gap-5">
           <button
             type="button"
-            // onClick={generateImage}
+            onClick={generateImage}
             className=" text-white bg-green-700 font-medium rounded-md text-sm w-full sm:w-auto px-5 py-2.5 text-center"
           >
             {generatingImg ? "Generating..." : "Generate"}
